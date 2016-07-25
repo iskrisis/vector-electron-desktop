@@ -1,0 +1,4204 @@
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+html {
+    /* hack to stop overscroll bounce on OSX and iOS.
+       N.B. Breaks things when we have legitimate horizontal overscroll */
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    /* Open Sans lacks combining diacritics, so these will fall through
+       to the next font.  Helevetica's diacritics however do not combine
+       nicely with Open Sans (on OSX, at least) and result in a huge
+       horizontal mess.  Arial empirically gets it right, hence prioritising
+       Arial here. */
+    font-family: 'Open Sans', Arial, Helvetica, Sans-Serif;
+    font-size: 15px;
+    color: #454545;
+    border: 0px;
+    margin: 0px;
+}
+
+div.error {
+    color: red;
+}
+
+h2 {
+    color: #454545;
+    font-weight: 400;
+    font-size: 18px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+a:hover,
+a:link,
+a:visited {
+    color: #76cfa6;
+}
+
+input[type=text]:focus, textarea:focus {
+    border: 1px solid #76CFA6;
+    outline: none;
+    box-shadow: none;
+}
+
+/* applied to side-panels and messagepanel when in RoomSettings */
+.mx_fadable {
+    opacity: 1;
+    -webkit-transition: opacity 0.2s ease-in-out;
+    -moz-transition: opacity 0.2s ease-in-out;
+    -ms-transition: opacity 0.2s ease-in-out;
+    -o-transition: opacity 0.2s ease-in-out;
+}
+
+/* XXX: critical hack to GeminiScrollbar to allow them to work in FF 42 and Chrome 48.
+   Stop the scrollbar view from pushing out the container's overall sizing, which causes
+   flexbox to adapt to the new size and cause the view to keep growing.
+ */
+.gm-scrollbar-container .gm-scroll-view {
+    position: absolute;
+}
+
+/* hack to avoid accidental click-throughs if you miss the narrow scrollbar */
+.gm-scrollbar.-vertical {
+    border-left: 6px solid transparent;
+}
+
+.mx_ContextualMenu_background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 1.0;
+    z-index: 2000;
+}
+
+.mx_ContextualMenu {
+    border: 1px solid #a4a4a4;
+    border-radius: 8px;
+    background-color: #fff;
+    color: #747474;
+    position: fixed;
+    z-index: 2001;
+    padding: 6px;
+}
+
+.mx_ContextualMenu_chevron_right {
+    padding: 12px;
+    position: absolute;
+    right: -21px;
+    top: 0px;
+}
+
+.mx_ContextualMenu_chevron_left {
+    padding: 12px;
+    position: absolute;
+    left: -21px;
+    top: 0px;
+}
+
+.mx_ContextualMenu_field {
+    padding: 3px 6px 3px 6px;
+    cursor: pointer;
+}
+
+.mx_ContextualMenu_spinner {
+    display: block;
+    margin: 0 auto;
+}
+
+.mx_Dialog_wrapper {
+    position: fixed;
+    z-index: 4000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+}
+
+.mx_Dialog {
+    background-color: #fff;
+    color: #747474;
+    text-align: center;
+    z-index: 4010;
+    font-weight: 300;
+    font-size: 15px;
+    position: relative;
+    border-radius: 8px;
+    max-width: 80%;
+}
+
+.mx_Dialog_background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    opacity: 0.2;
+}
+
+.mx_Dialog_lightbox .mx_Dialog_background {
+    opacity: 0.85;
+}
+
+.mx_Dialog_lightbox .mx_Dialog {
+    border-radius: 0px;
+    background-color: transparent;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    pointer-events: none;
+}
+
+.mx_Dialog_content {
+    margin: 24px;
+}
+
+.mx_Dialog_buttons {
+    padding-bottom: 24px;
+}
+
+.mx_Dialog button, .mx_Dialog input[type="submit"] {
+    border: 0px;
+    height: 36px;
+    border-radius: 36px;
+    font-weight: 400;
+    font-size: 15px;
+    color: #fff;
+    background-color: #76cfa6;
+    margin-left: 8px;
+    margin-right: 8px;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.mx_Dialog_title {
+    min-height: 16px;
+    padding: 12px;
+    border-bottom: 1px solid #a4a4a4;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+.mx_TextInputDialog_label {
+    text-align: left;
+    padding-bottom: 12px;
+}
+
+.mx_TextInputDialog_input {
+    font-size: 15px;
+    border-radius: 3px;
+    border: 1px solid #f0f0f0;
+    padding: 9px;
+    color: #454545;
+    background-color: #fff;
+}
+
+.emojione {
+    height: 1em;
+    vertical-align: middle;
+}
+
+::-moz-selection {
+    background-color: #76CFA6;
+    color: white;
+}
+
+::selection {
+    background-color: #76CFA6;
+    color: white;
+}
+.mx_RoomSettings_encrypt,
+.mx_CreateRoom_encrypt,
+.mx_RightPanel_filebutton
+{
+    display: none !important;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_CreateRoom {
+    width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+    color: #4a4a4a;
+}
+
+.mx_CreateRoom input,
+.mx_CreateRoom textarea  {
+    border-radius: 3px;
+    border: 1px solid #c7c7c7;
+    font-weight: 300;
+    font-size: 13px;
+    padding: 9px;
+    margin-top: 6px;
+}
+
+.mx_CreateRoom_description {
+    width: 330px;
+}
+
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_MatrixChat_splash {
+    position: relative;
+    height: 100%;
+}
+
+.mx_MatrixChat_splashButtons {
+    text-align: center;
+    width: 100%;
+    position: absolute;
+    bottom: 30px;
+}
+
+.mx_MatrixChat_wrapper {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+    flex-direction: column;
+    -webkit-flex-direction: column;
+
+    width: 100%;
+    height: 100%;
+}
+
+.mx_MatrixToolbar {
+    -webkit-box-ordinal-group: 1;
+    -moz-box-ordinal-group: 1;
+    -ms-flex-order: 1;
+    -webkit-order: 1;
+    order: 1;
+
+    height: 40px;
+}
+
+.mx_GuestWarningBar {
+    -webkit-box-ordinal-group: 1;
+    -moz-box-ordinal-group: 1;
+    -ms-flex-order: 1;
+    -webkit-order: 1;
+    order: 1;
+
+    height: 40px;
+}
+
+.mx_MatrixChat_toolbarShowing {
+    height: auto;
+}
+
+.mx_MatrixChat {
+    width: 100%;
+    height: 100%;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-box-ordinal-group: 2;
+    -moz-box-ordinal-group: 2;
+    -ms-flex-order: 2;
+    -webkit-order: 2;
+    order: 2;
+
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+.mx_MatrixChat .mx_LeftPanel {
+    -webkit-box-ordinal-group: 1;
+    -moz-box-ordinal-group: 1;
+    -ms-flex-order: 1;
+    -webkit-order: 1;
+    order: 1;
+
+    background-color: #eaf5f0;
+
+    -webkit-flex: 0 0 210px;
+    flex: 0 0 210px;
+}
+
+.mx_MatrixChat .mx_LeftPanel.collapsed {
+    -webkit-flex: 0 0 60px;
+    flex: 0 0 60px;
+}
+
+.mx_MatrixChat .mx_MatrixChat_middlePanel {
+    -webkit-box-ordinal-group: 2;
+    -moz-box-ordinal-group: 2;
+    -ms-flex-order: 2;
+    -webkit-order: 2;
+    order: 2;
+
+    padding-left: 25px;
+    padding-right: 22px;
+    background-color: #fff;
+
+    -webkit-flex: 1;
+    flex: 1;
+
+    /* Experimental fix for https://github.com/vector-im/vector-web/issues/947
+       and https://github.com/vector-im/vector-web/issues/946.
+       Empirically this stops the MessagePanel's width exploding outwards when
+       gemini is in 'prevented' mode
+       */
+    overflow-x: auto;
+
+    /* XXX: Hack: apparently if you try to nest a flex-box
+     * within a non-flex-box within a flex-box, the height
+     * of the innermost element gets miscalculated if the
+     * parents are both auto.  Height has to be auto here
+     * for RoomView to correctly fit when the Toolbar is shown.
+     * Ideally we'd launch straight into the RoomView at this
+     * point, but instead we fudge it and make the middlePanel
+     * flex itself.
+     */
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+}
+
+.mx_MatrixChat .mx_RightPanel {
+    -webkit-box-ordinal-group: 3;
+    -moz-box-ordinal-group: 3;
+    -ms-flex-order: 3;
+    -webkit-order: 3;
+    order: 3;
+
+    -webkit-flex: 0 0 235px;
+    flex: 0 0 235px;
+}
+
+.mx_MatrixChat .mx_RightPanel.collapsed {
+    -webkit-flex: 0 0 72px;
+    flex: 0 0 72px;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_RoomStatusBar {
+    margin-top: 15px;
+    margin-left: 65px;
+    min-height: 34px;
+}
+
+/* position the indicator in the same place horizontally as .mx_EventTile_avatar. */
+.mx_RoomStatusBar_indicator {
+    padding-left: 18px;
+    padding-right: 12px;
+    margin-left: -73px;
+    float: left;
+    width: 24px;
+    text-align: center;
+}
+
+.mx_RoomStatusBar_placeholderIndicator span {
+    color: #4a4a4a;
+    opacity: 0.5;
+    position: relative;
+    top: -4px;
+/*    
+    animation-duration: 1s;
+    animation-name: bounce;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+*/    
+}
+
+.mx_RoomStatusBar_placeholderIndicator span:nth-child(1) {
+    animation-delay: 0.3s;
+}
+.mx_RoomStatusBar_placeholderIndicator span:nth-child(2) {
+    animation-delay: 0.6s;
+}
+.mx_RoomStatusBar_placeholderIndicator span:nth-child(3) {
+    animation-delay: 0.9s;
+}
+
+@keyframes bounce {
+    from {
+        opacity: 0.5;
+        top: 0;
+    }
+
+    to {
+        opacity: 0.2;
+        top: -3px;
+    }
+}
+
+.mx_RoomStatusBar_scrollDownIndicator {
+    cursor: pointer;
+}
+
+.mx_RoomStatusBar_unreadMessagesBar {
+    color: #ff0064;
+    cursor: pointer;
+}
+
+.mx_RoomStatusBar_connectionLostBar {
+    margin-top: 19px;
+    height: 58px;
+}
+
+.mx_RoomStatusBar_connectionLostBar img {
+    padding-left: 10px;
+    padding-right: 22px;
+    vertical-align: middle;
+    float: left;
+}
+
+.mx_RoomStatusBar_connectionLostBar_title {
+    color: #ff0064;
+}
+
+.mx_RoomStatusBar_connectionLostBar_desc {
+    color: #454545;
+    font-size: 13px;
+    opacity: 0.5;
+}
+
+.mx_RoomStatusBar_resend_link {
+    color: #454545 ! important;
+    text-decoration: underline ! important;
+    cursor: pointer;
+}
+
+.mx_RoomStatusBar_tabCompleteBar {
+    color: #4a4a4a;
+}
+
+.mx_RoomStatusBar_typingBar {
+    color: #4a4a4a;
+    opacity: 0.5;
+    overflow-y: hidden;
+    display: block;
+}
+
+.mx_RoomStatusBar_tabCompleteWrapper {
+    display: flex;
+    display: -webkit-flex;
+    height: 26px;
+}
+
+.mx_RoomStatusBar_tabCompleteWrapper .mx_TabCompleteBar {
+    flex: 1 1 auto;
+    -webkit-flex: 1 1 auto;
+}
+
+.mx_RoomStatusBar_tabCompleteEol {
+    flex: 0 0 auto;
+    -webkit-flex: 0 0 auto;
+    color: #76CFA6;
+}
+
+.mx_RoomStatusBar_tabCompleteEol object {
+    vertical-align: middle;
+    margin-right: 8px;
+    margin-top: -2px;
+}
+
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_RoomView {
+    word-wrap: break-word;
+    position: relative;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    width: 100%;
+
+    flex-direction: column;
+    -webkit-flex-direction: column;
+}
+
+.mx_RoomView .mx_RoomHeader {
+    -webkit-box-ordinal-group: 1;
+    -moz-box-ordinal-group: 1;
+    -ms-flex-order: 1;
+    -webkit-order: 1;
+    order: 1;
+
+    -webkit-flex: 0 0 70px;
+    flex: 0 0 70px;
+}
+
+.mx_RoomView_fileDropTarget {
+    min-width: 0px;
+    max-width: 960px;
+    width: 100%;
+    font-size: 18px;
+    text-align: center;
+
+    pointer-events: none;
+
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-left: -12px;
+
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 2px #e1dddd solid;
+    border-bottom: none;
+    position: absolute;
+    top: 70px;
+    bottom: 0px;
+    z-index: 3000;
+}
+
+.mx_RoomView_fileDropTargetLabel {
+    top: 50%;
+    width: 100%;
+    margin-top: -50px;
+    position: absolute;
+}
+
+.mx_RoomView_auxPanel {
+    -webkit-box-ordinal-group: 2;
+    -moz-box-ordinal-group: 2;
+    -ms-flex-order: 2;
+    -webkit-order: 2;
+    order: 2;
+
+    min-width: 0px;
+    max-width: 960px;
+    width: 100%;
+    margin: auto;
+
+    overflow: auto;
+    border-bottom: 1px solid #e5e5e5;
+
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+}
+
+.mx_RoomView_topUnreadMessagesBar {
+    -webkit-box-ordinal-group: 3;
+    -moz-box-ordinal-group: 3;
+    -ms-flex-order: 3;
+    -webkit-order: 3;
+    order: 3;
+}
+
+.mx_RoomView_messagePanel {
+    -webkit-box-ordinal-group: 4;
+    -moz-box-ordinal-group: 4;
+    -ms-flex-order: 4;
+    -webkit-order: 4;
+    order: 4;
+
+    -webkit-flex: 1 1 0;
+    flex: 1 1 0;
+
+    width: 100%;
+
+    overflow-y: auto;
+}
+
+.mx_RoomView_messageListWrapper {
+    max-width: 960px;
+    margin: auto;
+
+    min-height: 100%;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+    flex-direction: column;
+    -webkit-flex-direction: column;
+
+    justify-content: flex-end;
+    -webkit-justify-content: flex-end;
+}
+
+.mx_RoomView_searchResultsPanel .mx_RoomView_messageListWrapper {
+    justify-content: flex-start;
+    -webkit-justify-content: flex-start;
+}
+
+.mx_RoomView_MessageList {
+    width: 100%;
+    list-style-type: none;
+    padding: 0px;
+}
+
+.mx_RoomView_MessageList li {
+    clear: both;
+}
+
+.mx_RoomView_MessageList h2 {
+    clear: both;
+    margin-top: 32px;
+    margin-bottom: 8px;
+    margin-left: 63px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.mx_RoomView_invitePrompt {
+    -webkit-box-ordinal-group: 2;
+    -moz-box-ordinal-group: 2;
+    -ms-flex-order: 2;
+    -webkit-order: 2;
+    order: 2;
+
+    min-width: 0px;
+    max-width: 960px;
+    width: 100%;
+    margin: auto;
+
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+li.mx_RoomView_myReadMarker_container {
+    height: 0px;
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+}
+
+hr.mx_RoomView_myReadMarker {
+    border-top: solid 1px #76cfa6;
+    border-bottom: solid 1px #76cfa6;
+    margin-top: 0px;
+    position: relative;
+    top: 5px;
+}
+
+.mx_RoomView_statusArea {
+    -webkit-box-ordinal-group: 5;
+    -moz-box-ordinal-group: 5;
+    -ms-flex-order: 5;
+    -webkit-order: 5;
+    order: 5;
+
+    width: 100%;
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+}
+
+.mx_RoomView_statusAreaBox {
+    max-width: 960px;
+    margin: auto;
+    min-height: 60px;
+}
+
+.mx_RoomView_statusAreaBox_line {
+    margin-left: 65px;
+    border-top: 1px solid #e5e5e5;
+    height: 1px;
+}
+
+.mx_RoomView_inCall .mx_RoomView_statusAreaBox_line {
+    border-top: 1px hidden;
+}
+
+.mx_RoomView_inCall .mx_MessageComposer_wrapper {
+    border-top: 2px hidden;
+}
+
+.mx_RoomView_inCall .mx_RoomView_statusAreaBox {
+    background-color: #76CFA6;
+    color: #fff;
+    position: relative;
+}
+
+.mx_RoomView_voipChevron {
+    position: absolute;
+    bottom: -11px;
+    right: 11px;
+}
+
+.mx_RoomView_voipButton {
+    float: right;
+    margin-right: 13px;
+    cursor: pointer;
+}
+
+.mx_RoomView_voipButton object {
+    pointer-events: none;
+}
+
+.mx_RoomView .mx_MessageComposer {
+    -webkit-box-ordinal-group: 6;
+    -moz-box-ordinal-group: 6;
+    -ms-flex-order: 6;
+    -webkit-order: 6;
+    order: 6;
+
+    width: 100%;
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+    margin-right: 2px;
+}
+
+.mx_RoomView_ongoingConfCallNotification {
+    width: 100%;
+    text-align: center;
+    background-color: #ff0064;
+    color: #fff;
+    font-weight: bold;
+    padding: 6px 0;
+    cursor: pointer;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_SearchBox {
+    height: 24px;
+    margin-left: 16px;
+    margin-right: 20px;
+    padding-top: 24px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+    display: flex;
+    display: -webkit-flex;
+}
+
+.mx_SearchBox_searchButton {
+    margin-right: 10px;
+    pointer-events: none;
+}
+
+.mx_SearchBox_closeButton {
+    cursor: pointer;
+}
+
+.mx_SearchBox_search {
+    flex: 1 1 auto;
+    -webkit-flex: 1 1 auto;
+    width: 0px;
+    font-family: 'Open Sans', Arial, Helvetica, Sans-Serif;
+    font-size: 12px;
+    margin-top: -2px;
+    height: 24px;
+    border: 0px ! important;
+    /* border-bottom: 1px solid rgba(0, 0, 0, 0.1) ! important; */
+    background-color: transparent;
+    border: 0px;
+}
+
+.mx_SearchBox_minimise,
+.mx_SearchBox_maximise {
+    margin-top: 3px;
+    cursor: pointer;
+}
+
+.mx_SearchBox_minimise {
+    margin-left: 10px;
+}
+
+.mx_SearchBox_maximise {
+    margin-left: 9px;
+}
+
+.mx_SearchBox object {
+    pointer-events: none;
+}/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_UploadBar {
+    position: relative;
+}
+
+.mx_UploadBar_uploadProgressOuter {
+    height: 5px;
+    margin-left: 63px;
+    margin-top: -1px;
+    padding-bottom: 5px;
+}
+
+.mx_UploadBar_uploadProgressInner {
+    background-color: #76cfa6;
+    height: 5px;
+}
+
+.mx_UploadBar_uploadFilename {
+    margin-top: 5px;
+    margin-left: 65px;
+    opacity: 0.5;
+    color: #4a4a4a;
+}
+
+.mx_UploadBar_uploadIcon {
+    float: left;
+    margin-top: 5px;
+    margin-left: 14px;
+}
+
+.mx_UploadBar_uploadCancel {
+    float: right;
+    margin-top: 5px;
+    margin-right: 10px;
+    position: relative;
+    opacity: 0.6;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.mx_UploadBar_uploadBytes {
+    float: right;
+    margin-top: 5px;
+    margin-right: 30px;
+    color: #76cfa6;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_UserSettings {
+    max-width: 960px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+}
+
+.mx_UserSettings .mx_RoomHeader {
+    -webkit-box-ordinal-group: 1;
+    -moz-box-ordinal-group: 1;
+    -ms-flex-order: 1;
+    -webkit-order: 1;
+    order: 1;
+
+    -webkit-flex: 0 0 70px;
+    flex: 0 0 70px;
+}
+
+.mx_UserSettings_body {
+    -webkit-box-ordinal-group: 2;
+    -moz-box-ordinal-group: 2;
+    -ms-flex-order: 2;
+    -webkit-order: 2;
+    order: 2;
+
+    -webkit-flex: 1 1 0;
+    flex: 1 1 0;
+
+    margin-top: -20px;
+    overflow-y: auto;
+}
+
+.mx_UserSettings h3 {
+    clear: both;
+    margin-left: 63px;
+    text-transform: uppercase;
+    color: #3d3b39;
+    font-weight: 600;
+    font-size: 13px;
+    margin-top: 26px;
+    margin-bottom: 10px;
+}
+
+.mx_UserSettings_section h3 {
+    margin-left: 0px;
+}
+
+.mx_UserSettings_spinner {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 12px;
+    width: 32px;
+    height: 32px;
+}
+
+.mx_UserSettings_button {
+    display: inline;
+    vertical-align: middle;
+    border: 0px;
+    border-radius: 36px;
+    font-weight: 400;
+    font-size: 16px;
+    color: #fff;
+    background-color: #76cfa6;
+    width: auto;
+    margin: auto;
+    padding: 7px;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    cursor: pointer;
+}
+
+.mx_UserSettings_section {
+    margin-left: 63px;
+    margin-top: 28px;
+    margin-bottom: 28px;
+}
+
+.mx_UserSettings_accountTable
+.mx_UserSettings_notifTable
+{
+    display: table;
+}
+
+.mx_UserSettings_notifTable .mx_Spinner {
+    position: absolute;
+}
+
+.mx_UserSettings_profileTable
+{
+    display: table;
+    float: left;
+}
+
+.mx_UserSettings_profileTableRow
+{
+    display: table-row;
+}
+
+.mx_UserSettings_profileLabelCell
+{
+    padding-bottom: 21px;
+    display: table-cell;
+    font-weight: bold;
+    padding-right: 24px;
+}
+
+.mx_UserSettings_profileInputCell {
+    display: table-cell;
+    padding-bottom: 21px;
+    width: 240px;
+}
+
+.mx_UserSettings_profileInputCell input,
+.mx_UserSettings_profileInputCell .mx_EditableText
+{
+    display: inline-block;
+    border: 0px;
+    border-bottom: 1px solid rgba(151, 151, 151, 0.5);
+    padding: 0px;
+    width: 240px;
+    color: rgba(74, 74, 74, 0.9);
+    font-family: 'Open Sans', Helvetica, Arial, Sans-Serif;
+    font-size: 16px;
+}
+
+.mx_UserSettings_addThreepid {
+    display: table-cell;
+    padding-left: 0.5em;
+    position: relative;
+    cursor: pointer;
+}
+
+.mx_UserSettings_changePasswordButton {
+    float: right;
+    margin-right: 32px;
+    margin-left: 32px;
+}
+
+.mx_UserSettings_logout {
+    float: right;
+    margin-right: 32px;
+    margin-left: 32px;
+}
+
+.mx_UserSettings_avatarPicker {
+    margin-left: 32px;
+    margin-right: 32px;
+    float: right;
+    cursor: pointer;
+}
+
+.mx_UserSettings_avatarPicker_img .mx_BaseAvatar_image {
+    object-fit: cover;
+}
+
+.mx_UserSettings_avatarPicker_edit {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.mx_UserSettings_avatarPicker_edit > input {
+    display: none;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_Login {
+    width: 100%;
+    height: 100%;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+
+    overflow: auto;
+}
+
+.mx_Login h2 {
+    color: #4a4a4a;
+    font-weight: 300;
+    margin-top: 32px;
+    margin-bottom: 20px;
+}
+
+.mx_Login_box {
+    width: 300px;
+    min-height: 450px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    margin: auto;
+}
+
+.mx_Login_logo {
+    text-align: center;
+}
+
+.mx_Login_field {
+    width: 100%;
+    border-radius: 3px;
+    border: 1px solid #c7c7c7;
+    font-weight: 300;
+    font-size: 13px;
+    padding: 9px;
+    margin-bottom: 14px;
+}
+
+.mx_Login_fieldLabel {
+    margin-top: -10px;
+    margin-left: 8px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.mx_Login_submit {
+    margin-top: 35px;
+    margin-bottom: 24px;
+    width: 100%;
+    border-radius: 40px;
+    height: 40px;
+    border: 0px;
+    background-color: #76cfa6;
+    font-size: 15px;
+    color: #fff;
+}
+
+.mx_Login_label {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.mx_Login_checkbox,
+.mx_Login_radio {
+    margin-right: 10px;
+}
+
+.mx_Login_create {
+    display: block;
+    text-align: center;
+    width: 100%;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.mx_Login_create:link {
+    color: #4a4a4a;
+}
+
+.mx_Login_links {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    width: 100%;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.mx_Login_links a:link {
+   color: #4a4a4a;
+}
+
+.mx_Login_prompt {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-size: 13px;
+}
+
+.mx_Login_forgot {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.mx_Login_forgot:link {
+    color: #4a4a4a;
+}
+
+.mx_Login_loader {
+    position: absolute;
+    left: 50%;
+    margin-top: 12px;
+}
+
+.mx_Login_error {
+    color: #ff2020;
+    font-weight: bold;
+    text-align: center;
+/*
+    height: 24px;
+*/
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_BaseAvatar {
+    position: relative;
+}
+
+.mx_BaseAvatar_initial {
+    position: absolute;
+    z-index: 1;
+    color: #fff;
+    text-align: center;
+    speak: none;
+    pointer-events: none;
+    font-weight: normal;
+}
+
+.mx_BaseAvatar_image {
+    border-radius: 40px;
+    vertical-align: top;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_SetDisplayNameDialog_input {
+    border-radius: 3px;
+    border: 1px solid #f0f0f0;
+    padding: 9px;
+    color: #454545;
+    background-color: #fff;
+    font-size: 15px;
+}/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_ProgressBar {
+    height: 5px;
+    border: 1px solid black;
+}
+
+.mx_ProgressBar_fill {
+    height: 100%;
+    background-color: #000;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_ServerConfig {
+    margin-top: 7px;
+}
+
+.mx_ServerConfig .mx_Login_field {
+    margin-top: 4px;
+    margin-bottom: 5px;
+}
+
+.mx_ServerConfig_help:link {
+    opacity: 0.8;
+    font-size: 13px;
+    font-weight: 300;
+    color: #4a4a4a;
+}/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_MImageBody {
+    display: block;
+}
+
+.mx_MImageBody_thumbnail {
+    max-width: 100%;
+/*
+    background-color: #fff;
+    border: 2px solid #fff;
+    border-radius: 1px;
+*/
+}
+
+.mx_MImageBody_download {
+    color: #76cfa6;
+    cursor: pointer;
+}
+
+.mx_MImageBody_download a {
+    color: #76cfa6;
+    text-decoration: none;
+}
+
+.mx_MImageBody_download object {
+    margin-left: -16px;
+    padding-right: 4px;
+    margin-top: -4px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_MNoticeBody {
+    white-space: pre-wrap;
+    opacity: 0.6;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_MTextBody {
+    white-space: pre-wrap;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_TextualEvent {
+    opacity: 0.5;
+    overflow-y: hidden;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_EntityTile {
+    display: table-row;
+    position: relative;
+    color: #454545;
+    cursor: pointer;
+}
+
+.mx_EntityTile_invite {
+    display: table-cell;
+    vertical-align: middle;
+    margin-left: 10px;
+    width: 26px;
+}
+
+.mx_EntityTile_avatar {
+    display: table-cell;
+    padding-left: 3px;
+    padding-right: 12px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    vertical-align: middle;
+    width: 36px;
+    height: 36px;
+    position: relative;
+}
+
+.mx_EntityTile_power {
+    position: absolute;
+    width: 16px;
+    height: 17px;
+    top: 0px;
+    right: 6px;
+}
+
+.mx_EntityTile_name {
+    display: table-cell;
+    vertical-align: middle;
+    overflow: hidden;
+    font-size: 14px;
+    text-overflow: ellipsis;
+}
+
+.mx_EntityTile_details {
+    display: table-cell;
+    padding-right: 14px;
+    vertical-align: middle;
+}
+
+.mx_EntityTile_name_hover {
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mx_EntityTile_chevron {
+    margin-top: 8px;
+    margin-right: -4px;
+    margin-left: 6px;
+    float: right;
+}
+
+.mx_EntityTile_ellipsis .mx_EntityTile_name {
+    font-style: italic;
+    font-color: #454545;
+}
+
+.mx_EntityTile_invitePlaceholder .mx_EntityTile_name {
+    font-style: italic;
+    font-color: #454545;
+}
+
+.mx_EntityTile_unavailable .mx_EntityTile_avatar,
+.mx_EntityTile_unavailable .mx_EntityTile_name,
+.mx_EntityTile_unavailable .mx_EntityTile_name_hover
+{
+    opacity: 0.66;
+}
+
+.mx_EntityTile_offline .mx_EntityTile_avatar,
+.mx_EntityTile_offline .mx_EntityTile_name,
+.mx_EntityTile_offline .mx_EntityTile_name_hover
+{
+    opacity: 0.25;
+}
+
+.mx_EntityTile_unknown .mx_EntityTile_avatar,
+.mx_EntityTile_unknown .mx_EntityTile_name,
+.mx_EntityTile_unknown .mx_EntityTile_name_hover
+{
+    opacity: 0.25;
+}
+
+
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_EventTile {
+    max-width: 100%;
+    clear: both;
+    margin-top: 24px;
+    margin-left: 65px;
+}
+
+.mx_EventTile_avatar {
+    padding-left: 18px;
+    padding-right: 12px;
+    margin-left: -73px;
+    margin-top: -2px;
+    float: left;
+    position: relative;
+    top: 0px;
+    cursor: pointer;
+}
+
+.mx_EventTile_continuation {
+    margin-top: 8px ! important;
+}
+
+.mx_EventTile .mx_SenderProfile {
+    color: #454545;
+    opacity: 0.5;
+    display: inline-block;
+    font-size: 13px;
+    overflow-y: hidden;
+    cursor: pointer;
+}
+
+.mx_EventTile .mx_MessageTimestamp {
+    color: #acacac;
+    font-size: 11px;
+}
+
+.mx_EventTile_line {
+    position: relative;
+    /* ideally should be 100px, but 95px gives us a max thumbnail size of 800x600, which is nice */
+    margin-right: 95px;
+}
+
+/* all the overflow-y: hidden; are to trap Zalgos -
+   but they introduce an implicit overflow-x: auto.
+   so make that explicitly hidden too to avoid random
+   horizontal scrollbars occasionally appearing, like in
+   https://github.com/vector-im/vector-web/issues/1154
+    */
+.mx_EventTile_content {
+    display: block;
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+
+/* Various markdown overrides */
+
+.mx_EventTile_content .markdown-body {
+    font-family: inherit ! important;
+    white-space: normal ! important;
+    line-height: inherit ! important;
+    color: inherit;
+    font-size: 15px;
+}
+
+/* have to use overlay rather than auto otherwise Linux and Windows
+   Chrome gets very confused about vertical spacing:
+   https://github.com/vector-im/vector-web/issues/754
+*/
+.mx_EventTile_content .markdown-body pre {
+    overflow-x: overlay;
+    overflow-y: visible;
+}
+
+.mx_EventTile_content .markdown-body h1,
+.mx_EventTile_content .markdown-body h2,
+.mx_EventTile_content .markdown-body h3,
+.mx_EventTile_content .markdown-body h4,
+.mx_EventTile_content .markdown-body h5,
+.mx_EventTile_content .markdown-body h6
+{
+    font-family: inherit ! important;
+}
+
+.mx_EventTile_content .markdown-body a {
+    color: #76cfa6;
+}
+
+.mx_EventTile_content .markdown-body .hljs {
+    display: inline ! important;
+}
+
+/* end of overrides */
+
+/* this is used for the tile for the event which is selected via the URL.
+ * TODO: ultimately we probably want some transition on here.
+ */
+.mx_EventTile_selected {
+    border-left: #76cfa6 5px solid;
+    margin-left: 53px;
+    padding-left: 7px;
+}
+
+.mx_EventTile_searchHighlight {
+    background-color: #76cfa6;
+    color: #fff;
+    border-radius: 5px;
+    padding-left: 2px;
+    padding-right: 2px;
+    cursor: pointer;
+}
+
+.mx_EventTile_searchHighlight a {
+    background-color: #76cfa6;
+    color: #fff;
+}
+
+.mx_EventTile_sending {
+    color: #ddd;
+}
+
+.mx_EventTile_notSent {
+    color: #f44;
+}
+
+.mx_EventTile_highlight,
+.mx_EventTile_highlight .markdown-body
+ {
+    color: #FF0064;
+}
+
+.mx_EventTile_contextual {
+    opacity: 0.4;
+}
+
+.mx_EventTile_msgOption {
+    float: right;
+    text-align: right;
+    z-index: 1;
+    position: relative;
+    width: 90px;
+    height: 1px; /* Hack to stop the height of this pushing the messages apart. Replaces marigin-top: -6px. This interacts better with a read marker being in between. Content overflows. */
+    margin-right: 10px;
+}
+
+.mx_EventTile_msgOption a {
+    text-decoration: none;
+}
+
+.mx_EventTile .mx_MessageTimestamp {
+    display: block;
+    visibility: hidden;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.mx_EventTile_last .mx_MessageTimestamp {
+    visibility: visible;
+}
+
+.mx_EventTile:hover .mx_MessageTimestamp {
+    visibility: visible;
+}
+
+.mx_EventTile_editButton {
+    position: absolute;
+    display: inline-block;
+    visibility: hidden;
+}
+
+.mx_EventTile:hover .mx_EventTile_editButton {
+    visibility: visible;
+}
+
+.mx_EventTile.menu .mx_EventTile_editButton {
+    visibility: visible;
+}
+
+.mx_EventTile.menu .mx_MessageTimestamp {
+    visibility: visible;
+}
+
+.mx_EventTile_readAvatars {
+    position: relative;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+}
+
+.mx_EventTile_readAvatars .mx_BaseAvatar {
+    position: absolute;
+    display: inline-block;
+}
+
+.mx_EventTile_readAvatarRemainder {
+    color: #acacac;
+    font-size: 11px;
+    position: absolute;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_LinkPreviewWidget {
+    margin-top: 15px;
+    margin-right: 15px;
+    margin-bottom: 15px;
+    display: -webkit-flex;
+    display: flex;
+    border-left: 4px solid #ddd;
+    color: #888;
+}
+
+.mx_LinkPreviewWidget_image {
+    -webkit-flex: 0 0 100px;
+    flex: 0 0 100px;
+    margin-left: 15px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.mx_LinkPreviewWidget_caption {
+    margin-left: 15px;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+}
+
+.mx_LinkPreviewWidget_title {
+    display: inline;
+    font-weight: bold;
+}
+
+.mx_LinkPreviewWidget_siteName {
+    display: inline;
+}
+
+.mx_LinkPreviewWidget_description {
+    margin-top: 8px;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.mx_LinkPreviewWidget_cancel {
+    visibility: hidden;
+    cursor: pointer;
+    -webkit-flex: 0 0 40px;
+    flex: 0 0 40px;
+}
+
+.mx_LinkPreviewWidget:hover .mx_LinkPreviewWidget_cancel {
+    visibility: visible;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_MemberInfo {
+    margin-top: 20px;
+    height: 100%;
+}
+
+.mx_MemberInfo h2 {
+    margin-top: 6px;
+}
+
+.mx_MemberInfo_cancel {
+    float: right;
+    margin-right: 18px;
+    cursor: pointer;
+}
+
+.mx_MemberInfo_avatar {
+    clear: both;
+}
+
+.mx_MemberInfo_avatar .mx_BaseAvatar {
+    cursor: not-allowed;
+}
+
+.mx_MemberInfo_avatar .mx_BaseAvatar.mx_BaseAvatar_image {
+    cursor: pointer;
+}
+
+.mx_MemberInfo_profile {
+    margin-bottom: 16px;
+}
+
+.mx_MemberInfo h3 {
+    text-transform: uppercase;
+    color: #3d3b39;
+    font-weight: 600;
+    font-size: 13px;
+    margin-top: 16px;
+    margin-bottom: 14px;
+}
+
+.mx_MemberInfo_profileField {
+    font-color: #999999;
+    font-size: 13px;
+    position: relative;
+    background-color: #fff;
+}
+
+.mx_MemberInfo_buttons {
+    margin-bottom: 16px;
+}
+
+.mx_MemberInfo_field {
+    cursor: pointer;
+    font-size: 13px;
+    color: #76cfa6;
+    margin-left: 8px;
+    line-height: 23px;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_MemberList {
+    height: 100%;
+
+    margin-top: 12px;
+    margin-right: 20px;
+
+    -webkit-flex: 1;
+    flex: 1;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+    flex-direction: column;
+    -webkit-flex-direction: column;
+}
+
+.mx_MemberList .mx_Spinner {
+    flex: 0;
+    -webkit-flex: 0;
+}
+
+.mx_MemberList_chevron {
+    position: absolute;
+    right: 35px;
+    margin-top: -15px;
+}
+
+.mx_MemberList_border {
+    overflow-y: auto;
+
+    order: 1;
+    -webkit-flex: 1 1 0;
+    flex: 1 1 0px;
+}
+
+.mx_MemberList .mx_SearchableEntityList {
+    order: 1;
+    flex: 0 0 auto;
+    -webkit-flex: 0 0 auto;
+}
+
+.mx_MemberList .mx_SearchableEntityList_expanded {
+    flex: 1 0 0;
+    -webkit-flex: 1 0 0;
+}
+
+.mx_MemberList_joined {
+    order: 2;
+    flex: 1 0 0;
+    -webkit-flex: 1 0 0;
+
+    overflow-y: auto;
+}
+
+/*
+.mx_MemberList_invited {
+    order: 3;
+    flex: 0 0 100px;
+    -webkit-flex: 0 0 100px;
+    overflow-y: auto;
+}
+*/
+
+.mx_MemberList_invited h2 {
+    text-transform: uppercase;
+    color: #3d3b39;
+    font-weight: 600;
+    font-size: 13px;
+    padding-left: 3px;
+    padding-right: 12px;
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+
+/* we have to have display: table in order for the horizontal wrapping to work */
+.mx_MemberList_wrapper {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.mx_MemberList_outerWrapper {
+    height: 0px;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_MessageComposer_wrapper {
+    max-width: 960px;
+    vertical-align: middle;
+    margin: auto;
+    border-top: 1px solid #e5e5e5;
+}
+
+.mx_MessageComposer_row {
+    display: table-row;
+    width: 100%;
+}
+
+.mx_MessageComposer .mx_MessageComposer_avatar {
+    display: table-cell;
+    padding-left: 10px;
+    padding-right: 28px;
+    vertical-align: middle;
+}
+
+.mx_MessageComposer .mx_MessageComposer_avatar .mx_BaseAvatar {
+    display: block;
+}
+
+.mx_MessageComposer_composecontrols {
+    width: 100%;
+}
+
+.mx_MessageComposer_noperm_error {
+    display: table-cell;
+    width: 100%;
+    vertical-align: middle;
+    height: 60px;
+    text-align: center;
+    font-style: italic;
+    color: #888;
+}
+
+.mx_MessageComposer_input {
+    display: table-cell;
+    width: 100%;
+    vertical-align: middle;
+    height: 60px;
+}
+
+.mx_MessageComposer_input textarea {
+    display: block;
+    font-size: 15px;
+    width: 100%;
+    padding: 0px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    border: 0px;
+    resize: none;
+    outline: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    color: #454545;
+    background-color: #fff;
+
+    /* needed for FF */
+    font-family: 'Open Sans', Arial, Helvetica, Sans-Serif;
+}
+
+/* hack for FF as vertical alignment of custom placeholder text is broken */
+.mx_MessageComposer_input textarea::-moz-placeholder {
+    line-height: 100%;
+    color: #76cfa6;
+    opacity: 1.0;
+}
+.mx_MessageComposer_input textarea::-webkit-input-placeholder {
+    color: #76cfa6;
+}
+
+.mx_MessageComposer_upload,
+.mx_MessageComposer_hangup,
+.mx_MessageComposer_voicecall,
+.mx_MessageComposer_videocall {
+    display: table-cell;
+    vertical-align: middle;
+    padding-left: 10px;
+    padding-right: 10px;
+    cursor: pointer;
+}
+
+.mx_MessageComposer_upload object,
+.mx_MessageComposer_hangup object,
+.mx_MessageComposer_voicecall object,
+.mx_MessageComposer_videocall object {
+    pointer-events: none;
+}
+
+.mx_MessageComposer_videocall {
+    padding-right: 10px;
+    padding-top: 4px;
+}
+
+.mx_MessageComposer_voicecall {
+    padding-right: 10px;
+    padding-top: 4px;
+}
+
+.mx_MessageComposer_upload object {
+    margin-top: 5px;
+}
+/*
+Copyright 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_PresenceLabel {
+    font-size: 11px;
+    opacity: 0.5;
+}/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+/* add 20px to the height of the header when editing */
+.mx_RoomHeader_editing {
+    -webit-flex: 0 0 93px ! important;
+    flex: 0 0 93px ! important;
+}
+
+.mx_RoomHeader_wrapper {
+    max-width: 960px;
+    margin: auto;
+    height: 70px;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+}
+
+.mx_RoomHeader_leftRow {
+    margin-left: -2px;
+
+    -webkit-box-ordinal-group: 1;
+    -moz-box-ordinal-group: 1;
+    -ms-flex-order: 1;
+    -webkit-order: 1;
+    order: 1;
+
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+.mx_RoomHeader_spinner {
+    height: 36px;
+
+    -webkit-box-ordinal-group: 2;
+    -moz-box-ordinal-group: 2;
+    -ms-flex-order: 2;
+    -webkit-order: 2;
+    order: 2;
+
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.mx_RoomHeader_textButton {
+    height: 36px;
+    background-color: #76cfa6;
+    border-radius: 36px;
+    margin-right: 8px;
+    color: #fff;
+    line-height: 34px;
+    margin-top: -2px;
+    text-align: center;
+
+    -webkit-box-ordinal-group: 2;
+    -moz-box-ordinal-group: 2;
+    -ms-flex-order: 2;
+    -webkit-order: 2;
+    order: 2;
+
+    cursor: pointer;
+
+/*
+    -webkit-flex: 0 0 90px;
+    flex: 0 0 90px;
+*/
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.mx_RoomHeader_cancelButton {
+    -webkit-box-ordinal-group: 2;
+    -moz-box-ordinal-group: 2;
+    -ms-flex-order: 2;
+    -webkit-order: 2;
+    order: 2;
+
+    cursor: pointer;
+
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.mx_RoomHeader_rightRow {
+    margin-top: 4px;
+    background-color: #fff;
+
+    -webkit-box-ordinal-group: 3;
+    -moz-box-ordinal-group: 3;
+    -ms-flex-order: 3;
+    -webkit-order: 3;
+    order: 3;
+}
+
+.mx_RoomHeader_info {
+    display: table-cell;
+    width: 100%;
+    vertical-align: middle;
+}
+
+.mx_RoomHeader_simpleHeader {
+    line-height: 70px;
+    color: #454545;
+    font-size: 22px;
+    font-weight: bold;
+    overflow: hidden;
+    margin-left: 63px;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.mx_RoomHeader_simpleHeader .mx_RoomHeader_cancelButton {
+    float: right;
+}
+
+.mx_RoomHeader_name {
+    vertical-align: middle;
+    width: 100%;
+    height: 31px;
+    overflow: hidden;
+    color: #454545;
+    font-weight: bold;
+    font-size: 22px;
+    padding-left: 19px;
+    padding-right: 16px;
+    /* why isn't text-overflow working? */
+    text-overflow: ellipsis;
+    border-bottom: 1px solid transparent;
+}
+
+.mx_RoomHeader_nametext {
+    display: inline-block;
+}
+
+.mx_RoomHeader_settingsHint {
+    color: #a2a2a2 ! important;
+}
+
+.mx_RoomHeader_searchStatus {
+    display: inline-block;
+    font-weight: normal;
+    opacity: 0.6;
+}
+
+.mx_RoomHeader_settingsButton {
+    display: inline-block;
+    position: relative;
+    bottom: 10px;
+    left: 4px;
+}
+
+.mx_RoomHeader_settingsButton object {
+    pointer-events: none;
+}
+
+.mx_RoomHeader_name,
+.mx_RoomHeader_avatar,
+.mx_RoomHeader_avatarPicker,
+.mx_RoomHeader_avatarPicker_edit {
+    cursor: pointer;
+}
+
+.mx_RoomHeader_name:hover div:not(.mx_RoomHeader_editable) {
+    color: #76cfa6;
+}
+
+.mx_RoomHeader_leaveButton {
+    margin-top: -1px;
+}
+
+.mx_RoomHeader_placeholder {
+    color: #a2a2a2 ! important;
+}
+
+.mx_RoomHeader_editable {
+    border-bottom: 1px solid #c7c7c7 ! important;
+    min-width: 150px;
+    cursor: text;
+}
+
+.mx_RoomHeader_editable:focus {
+    border-bottom: 1px solid #76CFA6 ! important;
+    outline: none;
+    box-shadow: none;
+}
+
+.mx_RoomHeader_topic {
+    vertical-align: bottom;
+    float: left;
+    max-height: 42px;
+    color: #A2A2A2;
+    font-weight: 300;
+    font-size: 13px;
+    margin-left: 19px;
+    margin-right: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-bottom: 1px solid transparent;
+}
+
+.mx_RoomHeader_avatar {
+    display: table-cell;
+    width: 48px;
+    height: 50px;
+    vertical-align: middle;
+}
+
+.mx_RoomHeader_avatar .mx_BaseAvatar_image {
+    object-fit: cover;
+}
+
+.mx_RoomHeader_avatarPicker_edit {
+    position: absolute;
+    margin-left: 16px;
+    margin-top: 4px;
+}
+
+.mx_RoomHeader_avatarPicker_edit > label {
+    cursor: pointer;
+}
+
+.mx_RoomHeader_avatarPicker_edit > input {
+    display: none;
+}
+
+.mx_RoomHeader_button {
+    display: table-cell;
+    vertical-align: top;
+    padding-left: 8px;
+    padding-right: 8px;
+    cursor: pointer;
+}
+
+.mx_RoomHeader_button object {
+    pointer-events: none;
+}
+
+.mx_RoomHeader_voipButton {
+    display: table-cell;
+}
+
+.mx_RoomHeader_voipButtons {
+    margin-top: 18px;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_RoomList {
+    padding-top: 8px;
+    padding-bottom: 12px;
+    min-height: 400px;
+}
+
+.mx_RoomList_expandButton {
+    margin-left: 8px;
+    cursor: pointer;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+/* Evil hacky override until Chrome fixes drop and drag table cells
+   and we can correctly fix horizontal wrapping in the sidebar again */
+.mx_RoomList_scrollbar .gm-scroll-view {
+    overflow-x: hidden ! important;
+    overflow-y: scroll ! important;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_RoomPreviewBar {
+    text-align: center;
+    height: 176px;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    flex-direction: column;
+    -webkit-flex-direction: column;
+
+    justify-content: center;
+    -webkit-justify-content: center;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+}
+
+.mx_RoomPreviewBar_wrapper {
+}
+
+.mx_RoomPreviewBar_invite_text {
+    color: #454545;
+}
+
+.mx_RoomPreviewBar_join_text {
+    color: #ff0064;
+}
+
+.mx_RoomPreviewBar_preview_text {
+    margin-top: 25px;
+    color: #a4a4a4;
+}
+
+.mx_RoomPreviewBar_join_text a {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.mx_RoomPreviewBar_warning {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    padding: 8px;
+}
+
+.mx_RoomPreviewBar_warningIcon {
+    padding: 12px;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_RoomSettings {
+    margin-left: 65px;
+    margin-bottom: 20px;
+}
+
+.mx_RoomSettings_powerLevels {
+    display: table;
+}
+
+.mx_RoomSettings_powerLevel {
+    display: table-row;
+}
+
+.mx_RoomSettings_powerLevelKey,
+.mx_RoomSettings_powerLevel .mx_PowerSelector {
+    display: table-cell;
+    padding-bottom: 5px;
+}
+
+.mx_RoomSettings_powerLevelKey {
+    text-align: right;
+    padding-right: 0.3em;
+}
+
+.mx_RoomSettings h3 {
+    text-transform: uppercase;
+    color: #3d3b39;
+    font-weight: 600;
+    font-size: 13px;
+    margin-top: 36px;
+    margin-bottom: 10px;
+}
+
+.mx_RoomSettings .mx_RoomSettings_toggles label {
+    margin-bottom: 8px;
+    display: block;
+}
+
+.mx_RoomSettings .mx_RoomSettings_toggles input[type="checkbox"],
+.mx_RoomSettings .mx_RoomSettings_toggles input[type="radio"] {
+    margin-right: 7px;
+}
+
+.mx_RoomSettings .mx_RoomSettings_tags input[type="checkbox"] {
+    margin-left: 1em;
+    margin-right: 7px;
+}
+
+.mx_RoomSettings .mx_RoomSettings_tags {
+    margin-bottom: 8px;
+}
+
+.mx_RoomSettings .mx_RoomSettings_roomColor {
+    display: inline-block;
+    position: relative;
+    width: 37px;
+    height: 37px;
+    border: 1px solid #979797;
+    margin-right: 13px;
+}
+
+.mx_RoomSettings .mx_RoomSettings_roomColor_selected {
+    position: absolute;
+    left: 10px;
+    top: 4px;
+}
+
+.mx_RoomSettings .mx_RoomSettings_roomColorPrimary {
+    height: 10px;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+}
+
+.mx_RoomSettings .mx_RoomSettings_aliasLabel {
+    margin-bottom: 8px;
+}
+
+.mx_RoomSettings .mx_RoomSettings_aliasesTable {
+    margin-top: 12px;
+    margin-bottom: 0px;
+    margin-left: 56px;
+    display: table;
+}
+
+.mx_RoomSettings .mx_RoomSettings_aliasesTableRow {
+    display: table-row;
+    margin-bottom: 16px;
+}
+
+.mx_RoomSettings .mx_RoomSettings_alias {
+    max-width: 400px;
+    margin-bottom: 16px;
+    /*
+    commented out so margin applies
+    display: table-cell; */
+}
+
+.mx_RoomSettings .mx_RoomSettings_addAlias,
+.mx_RoomSettings .mx_RoomSettings_deleteAlias {
+    display: table-cell;
+    padding-left: 0.5em;
+    position: relative;
+    cursor: pointer;
+}
+
+.mx_RoomSettings .mx_RoomSettings_addAlias img,
+.mx_RoomSettings .mx_RoomSettings_deleteAlias img {
+    visibility: hidden;
+}
+
+.mx_RoomSettings .mx_RoomSettings_aliasesTableRow:hover .mx_RoomSettings_addAlias img,
+.mx_RoomSettings .mx_RoomSettings_aliasesTableRow:hover .mx_RoomSettings_deleteAlias img {
+    visibility: visible;
+}
+
+.mx_RoomSettings_warning {
+    color: #ff0064;
+    font-weight: bold;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.mx_RoomSettings_editable {
+    border: 0px;
+    border-bottom: 1px solid #c7c7c7;
+    padding: 0px;
+    min-width: 240px;
+}
+
+.mx_RoomSettings_editable:focus {
+    border-bottom: 1px solid #76CFA6;
+    outline: none;
+    box-shadow: none;
+}
+
+.mx_RoomSettings_deleteAlias,
+.mx_RoomSettings_addAlias {
+    display: table-cell;
+    visibility: visible;
+}
+
+.mx_RoomSettings_deleteAlias:hover,
+.mx_RoomSettings_addAlias:hover {
+    visibility: visible;
+}
+
+.mx_RoomSettings_aliasPlaceholder {
+    color: #a2a2a2;
+}
+
+.mx_RoomSettings_buttons {
+    text-align: right;
+    margin-bottom: 16px;
+}
+
+.mx_RoomSettings_button {
+    display: inline;
+    border: 0px;
+    height: 36px;
+    border-radius: 36px;
+    font-weight: 400;
+    font-size: 15px;
+    color: #fff;
+    background-color: #76cfa6;
+    width: auto;
+    margin: auto;
+    padding: 6px;
+    padding-left: 1em;
+    padding-right: 1em;
+}/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_RoomTile {
+    cursor: pointer;
+    /* This fixes wrapping of long room names, but breaks drag & drop previews */
+    /* display: table-row; */
+    font-size: 13px;
+    position: relative;
+}
+
+.mx_RoomTile_avatar {
+    display: table-cell;
+    padding-right: 11px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 18px;
+    width: 24px;
+    height: 24px;
+    position: relative;
+    vertical-align: middle;
+}
+
+.mx_RoomTile_name {
+    display: table-cell;
+    width: 100%;
+    vertical-align: middle;
+    overflow: hidden;
+    word-break: break-word;
+    padding-right: 15px;
+    color: rgba(69, 69, 69, 0.8);
+}
+
+.mx_RoomTile_ellipsis .mx_RoomTile_name {
+    font-style: italic;
+    color: #454545;
+}
+
+.mx_RoomTile_invite {
+/*    color: rgba(69, 69, 69, 0.5);
+*/
+}
+
+.collapsed .mx_RoomTile_name {
+    display: none;
+}
+
+.collapsed .mx_RoomTile_badge {
+    margin-top: -15px;
+    right: 7px;
+}
+
+.mx_RoomTile_badge {
+    min-width: 12px;
+    height: 16px;
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    margin-top: -8px;
+    border-radius: 16px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 11px;
+    text-align: center;
+    padding: 0px 4px 0px 4px;
+}
+
+.mx_RoomTile_unreadNotify .mx_RoomTile_badge {
+    background-color: #76cfa6;
+}
+
+.mx_RoomTile_highlight .mx_RoomTile_badge {
+    background-color: #ff0064;
+}
+
+.mx_RoomTile_unread,
+.mx_RoomTile_highlight {
+    font-weight: bold;
+}
+
+/* the inner highlight span has 4px of padding on it, so we shrink the _avatar by 4px and grow the _name by 4px to fit it in */
+.mx_RoomTile_selected .mx_RoomTile_name {
+    padding-right: 19px;
+}
+.mx_RoomTile_selected .mx_RoomTile_avatar {
+    padding-right: 7px;
+}
+
+/* leave room for the badge, if present.
+   N.B. this has to come after the above _selected width tweaks */
+.mx_RoomTile_unreadNotify .mx_RoomTile_name,
+.mx_RoomTile_highlight .mx_RoomTile_name {
+    padding-right: 40px;
+}
+
+.mx_RoomTile_selected .mx_RoomTile_name span {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding: 4px;
+    margin-top: -4px;
+    margin-bottom: -4px;
+    border-radius: 2px;
+    background-color: rgba(118,207,166,0.2);
+}
+
+/* stop the span from overlapping with the badge */
+.mx_RoomTile_unreadNotify.mx_RoomTile_selected .mx_RoomTile_name span,
+.mx_RoomTile_highlight.mx_RoomTile_selected .mx_RoomTile_name span {
+    padding-right: 22px;
+}
+
+.mx_RoomTile_arrow {
+    position: absolute;
+    right: 0px;
+}
+
+.mx_RoomTile:hover {
+}
+/*
+Copyright 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_SearchableEntityList {
+    display: flex;
+    display: -webkit-flex;
+
+    flex-direction: column;
+    -webkit-flex-direction: column;
+}
+
+.mx_SearchableEntityList_query {
+    font-family: 'Open Sans', Arial, Helvetica, Sans-Serif;
+    border-radius: 3px;
+    border: 1px solid #f0f0f0;
+    padding: 9px;
+    color: #454545;
+    background-color: #fff;
+    margin-left: 3px;
+    font-size: 15px;
+    margin-bottom: 8px;
+    width: 189px;
+}
+
+.mx_SearchableEntityList_query::-moz-placeholder {
+    color: #454545;
+    opacity: 0.5;
+    font-size: 12px;
+}
+
+.mx_SearchableEntityList_query::-webkit-input-placeholder {
+    color: #454545;
+    opacity: 0.5;
+    font-size: 12px;
+}
+
+.mx_SearchableEntityList_listWrapper {
+    flex: 1;
+    -webkit-flex: 1;
+
+    overflow-y: auto;
+}
+
+.mx_SearchableEntityList_list {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.mx_SearchableEntityList_list .mx_EntityTile_chevron {
+    display: none;
+}
+
+.mx_SearchableEntityList_hrWrapper {
+    width: 100%;
+    flex: 0 0 auto;
+    -webkit-flex: 0 0 auto;
+}
+
+.mx_SearchableEntityList hr {
+    height: 1px;
+    border: 0px;
+    color: #e1dddd;
+    background-color: #e1dddd;
+    margin-right: 15px;
+    margin-top: 11px;
+    margin-bottom: 11px;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_TabCompleteBar {
+    overflow: hidden;
+}
+
+.mx_TabCompleteBar_item {
+    display: inline-block;
+    margin-right: 15px;
+    margin-bottom: 2px;
+    cursor: pointer;
+}
+
+.mx_TabCompleteBar_command {
+    margin-right: 8px;
+    background-color: #76CFA6;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    margin-bottom: 6px;
+    border-radius: 30px;
+}
+
+.mx_TabCompleteBar_command .mx_TabCompleteBar_text {
+    opacity: 1.0;
+    vertical-align: initial;
+    color: #fff;
+}
+
+.mx_TabCompleteBar_item img {
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.mx_TabCompleteBar_text {
+    color: #4a4a4a;
+    vertical-align: middle;
+    opacity: 0.5;
+}
+/*
+Copyright 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_TopUnreadMessagesBar {
+    margin: auto;  /* centre horizontally */
+    max-width: 960px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.mx_TopUnreadMessagesBar_scrollUp {
+    display: inline;
+    cursor: pointer;
+}
+
+.mx_TopUnreadMessagesBar_scrollUp img {
+    padding-left: 10px;
+    padding-right: 31px;
+    vertical-align: middle;
+}
+
+.mx_TopUnreadMessagesBar_scrollUp span {
+    opacity: 0.5;
+}
+
+.mx_TopUnreadMessagesBar_close {
+    float: right;
+    padding-right: 14px;
+    padding-top: 3px;
+    cursor: pointer;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*//*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_IncomingCallBox {
+    text-align: center;
+    border: 1px solid #a4a4a4;
+    border-radius: 8px;
+    background-color: #fff;
+    position: fixed;
+    z-index: 1000;
+    padding: 6px;
+    margin-top: -3px;
+    margin-left: -20px;
+    width: 200px;
+}
+
+.mx_IncomingCallBox_chevron {
+    padding: 12px;
+    position: absolute;
+    left: -21px;
+    top: 0px;
+}
+
+.mx_IncomingCallBox_title {
+    padding: 6px;
+    font-weight: bold;
+}
+
+.mx_IncomingCallBox_buttons {
+    display: flex;
+    display: -webkit-flex;
+}
+
+.mx_IncomingCallBox_buttons_cell {
+    vertical-align: middle;
+    padding: 6px;
+    flex: 1;
+    -webkit-flex: 1;
+}
+
+.mx_IncomingCallBox_buttons_decline,
+.mx_IncomingCallBox_buttons_accept {
+    vertical-align: middle;
+    width: 80px;
+    height: 36px;
+    line-height: 36px;
+    border-radius: 36px;
+    color: #fff;
+    margin: auto;
+}
+
+.mx_IncomingCallBox_buttons_decline {
+    background-color: #f48080;
+}
+
+.mx_IncomingCallBox_buttons_accept {
+    background-color: #80f480;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_VideoView {
+    width: 100%;
+    position: relative;
+    z-index: 30;
+}
+
+.mx_VideoView video {
+    width: 100%;
+}
+
+.mx_VideoView_remoteVideoFeed {
+    width: 100%;
+    background-color: #000;
+    z-index: 50;
+}
+
+.mx_VideoView_localVideoFeed {
+    width: 25%;
+    height: 25%;
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    z-index: 100;
+}
+
+.mx_VideoView_localVideoFeed video {
+    width: auto;
+    height: 100%;
+}.mx_CompatibilityPage {
+    width: 100%;
+    height: 100%;
+    background-color: #e55;
+}
+
+.mx_CompatibilityPage_box {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    width: 500px;
+    height: 300px;
+    border: 1px solid;
+    padding: 10px;
+    background-color: #fcc;
+}/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_LeftPanel {
+    position: relative;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+}
+
+.mx_LeftPanel_hideButton {
+    position: absolute;
+    top: 10px;
+    right: 0px;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.mx_LeftPanel_callView {
+
+}
+
+.mx_LeftPanel .mx_RoomList_scrollbar {
+    -webkit-box-ordinal-group: 1;
+    -moz-box-ordinal-group: 1;
+    -ms-flex-order: 1;
+    -webkit-order: 1;
+    order: 1;
+
+    -webkit-flex: 1 1 0;
+    flex: 1 1 0;
+
+    overflow-y: auto;
+}
+
+.mx_LeftPanel .mx_BottomLeftMenu {
+    -webkit-box-ordinal-group: 3;
+    -moz-box-ordinal-group: 3;
+    -ms-flex-order: 3;
+    -webkit-order: 3;
+    order: 3;
+
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    margin-left: 18px;
+    margin-right: 18px;
+    -webkit-flex: 0 0 60px;
+    flex: 0 0 60px;
+}
+
+.mx_LeftPanel .mx_BottomLeftMenu_options {
+    margin-top: 18px;
+}
+
+.mx_BottomLeftMenu_options object {
+    pointer-events: none;
+}
+
+.mx_LeftPanel .mx_BottomLeftMenu_createRoom,
+.mx_LeftPanel .mx_BottomLeftMenu_directory,
+.mx_LeftPanel .mx_BottomLeftMenu_settings {
+    display: inline-block;
+    cursor: pointer;
+}
+
+.collapsed .mx_BottomLeftMenu_createRoom,
+.collapsed .mx_BottomLeftMenu_directory,
+.collapsed .mx_BottomLeftMenu_settings {
+    margin-left: 0px ! important;
+    padding-top: 3px ! important;
+    padding-bottom: 3px ! important;
+}
+
+.mx_LeftPanel .mx_BottomLeftMenu_directory {
+    margin-left: 10px;
+}
+
+.mx_LeftPanel .mx_BottomLeftMenu_settings {
+    float: right;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_RightPanel {
+    position: relative;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+}
+
+.mx_RightPanel_header {
+    -webkit-box-ordinal-group: 1;
+    -moz-box-ordinal-group: 1;
+    -ms-flex-order: 1;
+    -webkit-order: 1;
+    order: 1;
+
+    border-bottom: 1px solid #e5e5e5;
+    margin-right: 20px;
+
+    -webkit-flex: 0 0 70px;
+    flex: 0 0 70px;
+}
+
+/** Fixme - factor this out with the main header **/
+
+.mx_RightPanel_headerButtonGroup {
+    margin-top: 25px;
+    float: left;
+    background-color: #fff;
+    margin-left: -4px;
+}
+
+.mx_RightPanel_headerButton {
+    cursor: pointer;
+    display: table-cell;
+    vertical-align: middle;
+    padding-left: 15px;
+    padding-right: 15px;
+    position: relative;
+}
+
+.mx_RightPanel_headerButton object {
+    pointer-events: none;
+}
+
+.mx_RightPanel_headerButton_highlight {
+    position: absolute;
+    bottom: -2px;
+    left: 10px;
+    width: 25px;
+    height: 4px;
+    background-color: #76cfa6;
+}
+
+.mx_RightPanel_headerButton_badge {
+    position: absolute;
+    top: 4px;
+    left: 28px;
+    font-size: 12px;
+    background-color: #76cfa6;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 20px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 0px;
+}
+
+.mx_RightPanel .mx_MemberList,
+.mx_RightPanel .mx_MemberInfo,
+.mx_RightPanel_blank {
+    -webkit-box-ordinal-group: 2;
+    -moz-box-ordinal-group: 2;
+    -ms-flex-order: 2;
+    -webkit-order: 2;
+    order: 2;
+    flex: 1;
+    -webkit-flex: 1;
+}
+
+.mx_RightPanel_footer {
+    -webkit-box-ordinal-group: 3;
+    -moz-box-ordinal-group: 3;
+    -ms-flex-order: 3;
+    -webkit-order: 3;
+    order: 3;
+
+    border-top: 1px solid #e5e5e5;
+    margin-right: 20px;
+
+    -webkit-flex: 0 0 60px;
+    flex: 0 0 60px;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_RoomDirectory {
+    max-width: 960px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 12px;
+    color: #4a4a4a;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+    flex-direction: column;
+    -webkit-flex-direction: column;
+}
+
+.mx_RoomDirectory_list {
+    -webkit-flex: 1;
+    flex: 1;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+    flex-direction: column;
+    -webkit-flex-direction: column;
+}
+
+.mx_RoomDirectory_input {
+    margin: auto;
+    border-radius: 3px;
+    border: 1px solid #c7c7c7;
+    font-weight: 300;
+    font-size: 13px;
+    padding: 9px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+.mx_RoomDirectory_tableWrapper {
+    overflow-y: auto;
+    -webkit-flex: 1 1 0;
+    flex: 1 1 0;
+}
+
+.mx_RoomDirectory_table {
+    font-size: 14px;
+    color: #4a4a4a;
+    width: 100%;
+    text-align: left;
+    table-layout: fixed;
+}
+
+.mx_RoomDirectory_roomAvatar {
+    width: 24px;
+    padding-left: 12px;
+    padding-right: 24px;
+    vertical-align: top;
+}
+
+.mx_RoomDirectory_roomDescription {
+    padding-bottom: 16px;
+}
+
+.mx_RoomDirectory_name {
+    display: inline-block;
+    font-weight: 600;
+}
+
+.mx_RoomDirectory_perms {
+    display: inline-block;
+}
+
+.mx_RoomDirectory_perm {
+    display: inline;
+    padding-left: 5px;
+    padding-right: 5px;
+    height: 15px;
+    border-radius: 11px;
+    background-color: #eaf5f0;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 11px;
+    color: #61c295;
+}
+
+.mx_RoomDirectory_topic {
+    cursor: initial;
+}
+
+.mx_RoomDirectory_alias {
+    font-size: 12px;
+    color: #b3b3b3;
+}
+
+.mx_RoomDirectory_roomMemberCount {
+    text-align: right;
+    width: 100px;
+    padding-right: 10px;
+}
+
+.mx_RoomDirectory_table tr {
+    padding-bottom: 10px;
+    cursor: pointer;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_RoomSubList {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.mx_RoomSubList_label {
+    text-transform: uppercase;
+    color: #3d3b39;
+    font-weight: 600;
+    font-size: 13px;
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    cursor: pointer;
+}
+
+.mx_RoomSubList_chevron {
+    padding-left: 4px;
+    pointer-events: none;
+}
+
+.collapsed .mx_RoomSubList_chevron  {
+    padding-left: 12px;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_ViewSource pre {
+    text-align: left;
+    font-size: 12px;
+    padding: 0.5em 1em 0.5em 1em;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+/* This has got to be the most fragile piece of CSS ever written.
+   But empirically it works on Chrome/FF/Safari
+ */
+
+.mx_ImageView {
+    display: -webkit-flex;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    -webkit-align-items: center;
+    align-items: center;
+}
+
+.mx_ImageView_lhs {
+    -webkit-box-ordinal-group: 1;
+    order: 1;
+    -webkit-flex: 1;
+    flex: 1 1 10%;
+    min-width: 60px;
+    /*
+    background-color: #080;
+    height: 20px;
+    */
+}
+
+.mx_ImageView_content {
+    -webkit-box-ordinal-group: 2;
+    order: 2;
+    /* min-width hack needed for FF */
+    min-width: 0px;
+    height: 90%;
+    -webkit-flex: 15;
+    flex: 15 15 0;
+
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    -webkit-justify-content: center;
+    align-items: center;
+    justify-content: center;
+}
+
+.mx_ImageView_content img {
+    max-width: 100%;
+    /* XXX: max-height interacts badly with flex on Chrome and doesn't relayout properly until you refresh */
+    max-height: 100%;
+    /* object-fit hack needed for Chrome due to Chrome not re-laying-out until you refresh */
+    object-fit: contain;
+    /* background-image: url('img/trans.png'); */
+    pointer-events: all;
+}
+
+.mx_ImageView_labelWrapper {
+    position: absolute;
+    top: 0px;
+    height: 100%;
+    overflow: auto;
+    pointer-events: all;
+}
+
+.mx_ImageView_label {
+    text-align: left;
+    display: flex;
+    display: -webkit-flex;
+    justify-content: center;
+    -webkit-justify-content: center;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    padding-left: 30px;
+    padding-right: 30px;
+    min-height: 100%;
+    max-width: 240px;
+    color: #fff;
+}
+
+.mx_ImageView_cancel {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    padding: 35px;
+    cursor: pointer;
+}
+
+.mx_ImageView_name {
+    font-size: 18px;
+    margin-bottom: 6px;
+    word-wrap: break-word;
+}
+
+.mx_ImageView_metadata {
+    font-size: 15px;
+    opacity: 0.5;
+}
+
+.mx_ImageView_download {
+    display: table;
+    margin-top: 24px;
+    margin-bottom: 6px;
+    border-radius: 5px;
+    background-color: #454545;
+    font-size: 14px;
+    padding: 9px;
+    border: 1px solid #fff;
+}
+
+.mx_ImageView_size {
+    font-size: 11px;
+}
+
+.mx_ImageView_link {
+    color: #fff ! important;
+    text-decoration: none ! important;
+}
+
+.mx_ImageView_button {
+    font-size: 15px;
+    opacity: 0.5;
+    margin-top: 18px;
+    cursor: pointer;
+}
+
+.mx_ImageView_shim {
+    height: 30px;
+}
+
+.mx_ImageView_rhs {
+    -webkit-box-ordinal-group: 3;
+    order: 3;
+    -webkit-flex: 1;
+    flex: 1 1 10%;
+    min-width: 300px;
+    /*
+    background-color: #800;
+    height: 20px;
+    */
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_Spinner {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    -webkit-justify-content: center;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    -webkit-flex: 1;
+}
+
+.mx_MatrixChat_middlePanel .mx_Spinner {
+    height: auto;
+}/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_GuestWarningBar {
+    background-color: #76cfa6;
+    color: #fff;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+}
+
+.mx_GuestWarningBar_warning {
+    margin-left: 16px;
+    margin-right: 8px;
+    margin-top: -2px;
+}
+
+.mx_GuestWarningBar a {
+    color: #fff ! important;
+    text-decoration: underline ! important;
+    cursor: pointer;
+}
+
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_MatrixToolbar {
+    background-color: #76cfa6;
+    color: #fff;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+}
+
+.mx_MatrixToolbar_warning {
+    margin-left: 16px;
+    margin-right: 8px;
+    margin-top: -2px;
+}
+
+.mx_MatrixToolbar_link
+{
+    color: #fff ! important;
+    text-decoration: underline ! important;
+    cursor: pointer;
+}
+
+.mx_MatrixToolbar_close {
+    -webkit-flex: 1;
+    flex: 1;
+    cursor: pointer;
+    text-align: right;
+}
+
+.mx_MatrixToolbar_close img {
+    display: block;
+    float: right;
+    margin-right: 10px;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_MessageTimestamp {
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_RoomDropTarget {
+    font-size: 13px;
+    margin-left: 10px;
+    margin-right: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border: 1px dashed #76cfa6;
+    color: #454545;
+    background-color: rgba(255,255,255,0.5);
+    border-radius: 4px;
+}
+
+.collapsed .mx_RoomDropTarget {
+    margin-right: 10px;
+}
+
+.mx_RoomDropTarget_placeholder {
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.mx_RoomDropTarget_avatar {
+    background-color: #fff;
+    border-radius: 24px;
+    width: 24px;
+    height: 24px;
+    float: left;
+    margin-left: 7px;
+    margin-right: 7px;
+}
+
+.mx_RoomDropTarget_label {
+    position: relative;
+    margin-top: 3px;
+    line-height: 21px;
+    z-index: 1;
+}
+
+.collapsed .mx_RoomDropTarget_avatar {
+    float: none;
+}
+
+.collapsed .mx_RoomDropTarget_label {
+    display: none;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_RoomTooltip {
+    display: none;
+    position: fixed;
+    border: 1px solid #a4a4a4;
+    border-radius: 8px;
+    background-color: #fff;
+    z-index: 1000;
+    left: 64px;
+    padding: 6px;
+}
+
+.mx_RoomTooltip_chevron {
+    position: absolute;
+    left: -9px;
+    top: 8px;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_SearchBar {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    display: flex;
+    display: -webkit-flex;
+    align-items: center;
+    -webkit-align-items: center;
+}
+
+.mx_SearchBar_input {
+    display: inline block;
+    border-radius: 3px 0px 0px 3px;
+    border: 1px solid #f0f0f0;
+    font-size: 15px;
+    padding: 9px;
+    padding-left: 11px;
+    width: auto;
+    flex: 1 1 0;
+    -webkit-flex: 1 1 0;
+}
+
+.mx_SearchBar_searchButton {
+    cursor: pointer;
+    margin-right: 10px;
+    width: 37px;
+    height: 37px;
+    border-radius: 0px 3px 3px 0px;
+    background-color: #76CFA6;
+}
+
+@keyframes pulsate {
+    0% { opacity: 1.0; }
+    50% { opacity: 0.1; }
+    100% { opacity: 1.0; }
+}
+
+.mx_SearchBar_searching img {
+    animation: pulsate 0.5s ease-out;
+    animation-iteration-count: infinite;
+}
+
+.mx_SearchBar_button {
+    display: inline;
+    border: 0px;
+    border-radius: 36px;
+    font-weight: 400;
+    font-size: 15px;
+    color: #fff;
+    background-color: #76cfa6;
+    width: auto;
+    margin: auto;
+    margin-left: 7px;
+    padding-top: 6px;
+    padding-bottom: 4px;
+    padding-left: 24px;
+    padding-right: 24px;
+    cursor: pointer;
+}
+
+.mx_SearchBar_unselected {
+    background-color: #fff;
+    color: #76CFA6;
+    border: #76CFA6 1px solid;
+}
+
+.mx_SearchBar_cancel {
+    padding-left: 14px;
+    padding-right: 14px;
+    cursor: pointer;
+}
+/*
+Copyright 2015, 2016 OpenMarket Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.mx_UserNotifSettings_tableRow
+{
+    display: table-row;
+}
+
+.mx_UserNotifSettings_inputCell {
+    display: table-cell;
+    padding-bottom: 21px;
+    padding-right: 8px;
+    width: 16px;
+}
+
+.mx_UserNotifSettings_labelCell
+{
+    padding-bottom: 21px;
+    width: 400px;
+    display: table-cell;
+}
+
+.mx_UserNotifSettings_pushRulesTableWrapper {
+    padding-bottom: 21px;
+}
+
+.mx_UserNotifSettings_pushRulesTable {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.mx_UserNotifSettings_pushRulesTable thead {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.mx_UserNotifSettings_pushRulesTable tbody th {
+    font-weight: 400;
+    font-size: 15px;
+}
+
+.mx_UserNotifSettings_pushRulesTable tbody th:first-child {
+    text-align: left;
+}
+
+.mx_UserNotifSettings_keywords {
+    cursor: pointer;
+    color: #76cfa6;
+}
+
+.mx_UserSettings_devicesTable td {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.mx_UserSettings_devicesTable_nodevices {
+    font-style: italic;
+}

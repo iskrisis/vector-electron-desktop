@@ -1,0 +1,27 @@
+{
+  "name": "vector-electron-desktop",
+  "version": "0.0.1",
+  "description": "Basic electron wrapper for Vector (http://vector.im) a messaging client that uses Matrix protocol (http://matrix.org/).",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/electron/electron-quick-start.git"
+  },
+  "author": "KRISIS",
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/electron/electron-quick-start/issues"
+  },
+  "homepage": "https://github.com/electron/electron-quick-start#readme",
+  "devDependencies": {
+    "devtron": "^1.2.1",
+    "electron-packager": "^7.3.0",
+    "electron-prebuilt": "^1.2.0"
+  },
+  "dependencies": {
+    "open": "0.0.5"
+  }
+}
