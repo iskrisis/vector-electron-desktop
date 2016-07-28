@@ -1,5 +1,5 @@
 # Vector Electron Desktop
-Simple Vector.im wrapped in electron to make desktop app. Its most of the code is from [electron-quick-start](https://github.com/electron/electron-quick-start).
+Simple Vector.im wrapped in electron to make desktop app. Most of the code is from [electron-quick-start](https://github.com/electron/electron-quick-start).
 
 
 ## How to build
