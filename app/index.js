@@ -19,10 +19,11 @@ let image = nativeImage.createFromPath('file://${__dirname}/icon.png');
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600, icon: image})
+  mainWindow = new BrowserWindow({width: 800, height: 600, icon: __dirname.split('/').slice(0, -1).join('/') + '/icons/icon.png'})
 
+console.log(__dirname.split('/').slice(0, -1).join('/') + '/icons/icon.png')
   //Load main vector file
-  mainWindow.loadURL(`file://${__dirname}/vector/index.html`)
+  mainWindow.loadURL(`file://${__dirname}/index.html`)
 
   //Create app wide menu from template. Needed for shortcuts to work.
   const menu = Menu.buildFromTemplate(template);
