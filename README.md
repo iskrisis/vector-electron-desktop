@@ -17,3 +17,9 @@ electron-packager . Vector --platform=darwin --arch=x64 --icon icons/icon
 
 
 Better automatic build should be possible with [electron-builder](https://github.com/electron-userland/electron-builder).
+
+## Roadmap
+
+* [ ] Packaging scripts for major OS
+* [ ] Badges
+* [ ] Dynamicly loads html/js/css
