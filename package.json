@@ -7,7 +7,7 @@
     "pack-icons": "iconutil -c icns icon.iconset",
     "pack-osx": "electron-packager . --out=dist --prune --asar --overwrite --platform=darwin --arch=x64",
     "pack-linux": "electron-packager . --out=dist --prune --asar --overwrite --platform=linux --arch=x64",
-    "pack-win32": "electron-packager . --out=dist --prune --asar --overwrite --platform=win32 --arch=x64 --version-string.ProductName=\"Inbox\" --version-string.FileDescription=\"Inbox\" --version-string.OriginalFilename=\"Inbox.exe\"",
+    "pack-win32": "electron-packager . --out=dist --prune --asar --overwrite --platform=win32 --arch=x64 --version-string.ProductName=\"Vector\" --version-string.FileDescription=\"Vector\" --version-string.OriginalFilename=\"Vector.exe\"",
     "start": "electron ."
   },
   "repository": {
