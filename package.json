@@ -8,7 +8,11 @@
     "pack-osx": "electron-packager . --out=dist --prune --asar --overwrite --platform=darwin --arch=x64",
     "pack-linux": "electron-packager . --out=dist --prune --asar --overwrite --platform=linux --arch=x64",
     "pack-win32": "electron-packager . --out=dist --prune --asar --overwrite --platform=win32 --arch=x64 --version-string.ProductName=\"Vector\" --version-string.FileDescription=\"Vector\" --version-string.OriginalFilename=\"Vector.exe\"",
-    "start": "electron ."
+    "start": "electron .",
+    "zip-osx": "test -e dist/vector-electron-desktop-darwin-x64 && tar -czvf ./dist/vector-electron-darwin-x64.tgz dist/vector-electron-desktop-darwin-x64",
+    "zip-linux": "test -e dist/vector-electron-desktop-linux-x64 && tar -czvf ./dist/vector-electron-linux-x64.tgz dist/vector-electron-desktop-linux-x64",
+    "zip-windows": "test -e dist/vector-electron-desktop-win32-x64 && tar -czvf ./dist/vector-electron-win32-x64.tgz dist/vector-electron-desktop-win32-x64",
+    "zip": "npm run zip-linux; npm run zip-osx"
   },
   "repository": {
     "type": "git",
