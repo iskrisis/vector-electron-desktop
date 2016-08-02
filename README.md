@@ -19,7 +19,7 @@ npm run pack-osx
 npm run pack-windows
 ```
 
-package will be placed under `dist/` folder, tar and zip if you like to distribute it (currently using tar, so only works on linux/osx)
+package will be placed under `dist/` folder, tar and zip if you like to distribute it (currently using tar, so only works on linux/osx/mingw/cygwin)
 
 ```bash
 # zip all under dist/
