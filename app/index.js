@@ -42,10 +42,9 @@ function createWindow () {
   if (process.platform !== 'darwin') {
     tray = new Tray(iconPath);
     const contextMenu = Menu.buildFromTemplate([
-      {label: 'Item1', type: 'radio'},
-      {label: 'Item2', type: 'radio'},
-      {label: 'Item3', type: 'radio', checked: true},
-      {label: 'Item4', type: 'radio'}
+      {
+        role: 'quit'
+      }
     ]);
     tray.setToolTip('This is my application.');
     tray.setContextMenu(contextMenu);
@@ -88,7 +87,10 @@ const template = [
           prefWindow = new BrowserWindow({width: 400, height: 300, icon: __dirname.split('/').slice(0, -1).join('/') + '/icons/icon.png'});
           prefWindow.loadURL(`file://${__dirname}/pref/index.html`);
         }
-      }
+      },
+      {
+        role: 'quit'
+      },
     ]
   },
   {
