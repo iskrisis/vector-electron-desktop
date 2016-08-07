@@ -2,7 +2,7 @@ const electron = require('electron')
 const open = require('open')
 // Module to control application life.
 const {app, Menu, Tray} = require('electron')
-
+const {join, resolve, normalize} = require('path')
 
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
@@ -15,7 +15,7 @@ let tray;
 //Creating icon for the app. Not sure where used. Differes depending on platform.
 const nativeImage = require('electron').nativeImage;
 let image = nativeImage.createFromPath('file://${__dirname}/icon.png');
-let iconPath = __dirname.split('/').slice(0, -1).join('/') + '/icons/icon.png';
+let iconPath = normalize(join(__dirname, "..",  "/icons/icon.png"));
 
 function createWindow () {
   // Create the browser window.
