@@ -1,29 +1,28 @@
-
 const electron = require('electron')
 const open = require('open')
 // Module to control application life.
-const app = electron.app
-const Menu = electron.Menu;
+const {app, Menu, Tray} = require('electron')
+
 
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
-
+let mainWindow;
+let prefWindow;
+let tray;
 
 //Creating icon for the app. Not sure where used. Differes depending on platform.
 const nativeImage = require('electron').nativeImage;
 let image = nativeImage.createFromPath('file://${__dirname}/icon.png');
-
+let iconPath = __dirname.split('/').slice(0, -1).join('/') + '/icons/icon.png';
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600, icon: __dirname.split('/').slice(0, -1).join('/') + '/icons/icon.png'})
+  mainWindow = new BrowserWindow({width: 800, height: 600, icon: iconPath});
 
-console.log(__dirname.split('/').slice(0, -1).join('/') + '/icons/icon.png')
   //Load main vector file
-  mainWindow.loadURL(`file://${__dirname}/index.html`)
+  mainWindow.loadURL(`file://${__dirname}/index.html`);
 
   //Create app wide menu from template. Needed for shortcuts to work.
   const menu = Menu.buildFromTemplate(template);
@@ -40,7 +39,17 @@ console.log(__dirname.split('/').slice(0, -1).join('/') + '/icons/icon.png')
     mainWindow = null;
   })
 
-
+  if (process.platform !== 'darwin') {
+    tray = new Tray(iconPath);
+    const contextMenu = Menu.buildFromTemplate([
+      {label: 'Item1', type: 'radio'},
+      {label: 'Item2', type: 'radio'},
+      {label: 'Item3', type: 'radio', checked: true},
+      {label: 'Item4', type: 'radio'}
+    ]);
+    tray.setToolTip('This is my application.');
+    tray.setContextMenu(contextMenu);
+  }
 }
 
 // This method will be called when Electron has finished
@@ -69,6 +78,19 @@ app.on('activate', function () {
 
 // long menu template - could be separated
 const template = [
+  {
+    label: 'Vector',
+    submenu: [
+      {
+        label: 'Preferences',
+        accelerator: 'CmdOrCtrl+,',
+        click(item, focusedWindow) {
+          prefWindow = new BrowserWindow({width: 400, height: 300, icon: __dirname.split('/').slice(0, -1).join('/') + '/icons/icon.png'});
+          prefWindow.loadURL(`file://${__dirname}/pref/index.html`);
+        }
+      }
+    ]
+  },
   {
     label: 'Edit',
     submenu: [
@@ -206,6 +228,3 @@ if (process.platform === 'darwin') {
     }
   ];
 }
-
-
-
