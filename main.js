@@ -1,6 +1,5 @@
-
 const electron = require('electron')
-const open = require('open')
+
 // Module to control application life.
 const app = electron.app
 const Menu = electron.Menu;
@@ -31,7 +30,7 @@ function createWindow () {
   //Hijack all _blank links to open in browser instead of electron window.
   mainWindow.webContents.on('new-window', function(event, url){
     event.preventDefault();
-    open(url);
+    electron.shell.openExternal(url);
   });
 
   // Emitted when the window is closed.
