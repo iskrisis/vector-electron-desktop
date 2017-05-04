@@ -1,3 +1,10 @@
+# DONT USE THIS ANYMORE
+This was temporary solution for desktop version of Vector (now Riot) client for matrix. You will find much better client here https://riot.im/ 
+
+
+
+
+
 # Vector Electron Desktop
 Simple Vector.im wrapped in electron to make desktop app. Most of the code is from [electron-quick-start](https://github.com/electron/electron-quick-start).
 
